@@ -3,9 +3,9 @@
 import { useState } from "react";
 
 const companies = [
-  { id: 1, name: "Google", jobs: ["Software Engineer", "Product Manager"], password: "google123" },
-  { id: 2, name: "Microsoft", jobs: ["Data Scientist", "UX Designer"], password: "microsoft456" },
-  { id: 3, name: "Amazon", jobs: ["Cloud Engineer", "Business Analyst"], password: "amazon789" },
+  { id: 1, name: "Cosy BV", jobs: ["Full stack developer", "Community facillitator"], password: "cosybv" },
+  { id: 2, name: "company2", jobs: ["Data Scientist", "UX Designer"], password: "microsoft456" },
+  { id: 3, name: "company3", jobs: ["Cloud Engineer", "Business Analyst"], password: "amazon789" },
 ];
 
 export default function JobManagementApp() {
@@ -26,6 +26,7 @@ export default function JobManagementApp() {
       alert("Incorrect password! Please try again.");
     }
   };
+
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedJob) return;
