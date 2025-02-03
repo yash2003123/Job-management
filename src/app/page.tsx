@@ -1,6 +1,7 @@
 "use client";  // Required for React state usage
 
 import { useState } from "react";
+import { useEffect } from "react";
 
 const companies = [
   { id: 1, name: "Cosy BV", jobs: ["Full stack developer", "Community facillitator"], password: "cosybv" },
@@ -14,9 +15,22 @@ export default function JobManagementApp() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [passwordInput, setPasswordInput] = useState(""); // Store entered password
   const [passwordError, setPasswordError] = useState(false); // Track incorrect password
-  const [cvUploads, setCvUploads] = useState<{ [job: string]: File[] }>(
+  const [cvUploads, setCvUploads] = useState<{ [job: string]: File[] }>(() => {
+  
+
+
+useEffect(() => {
+  localStorage.setItem("cvUploads", JSON.stringify(cvUploads));
+}, [cvUploads]);
+    try {
+      return JSON.parse(localStorage.getItem("cvUploads") || "{}") || {};
+    } catch (error) {
+      console.error("Error parsing CV uploads from localStorage:", error);
+      return {};
+    }
+  });
     () => JSON.parse(localStorage.getItem("cvUploads") || "{}")
-  );
+  ;
   
 
   const handleCompanySelection = (company: { id: number; name: string; jobs: string[]; password: string }) => {
@@ -118,7 +132,8 @@ export default function JobManagementApp() {
           </div>
 
           {/* Display Uploaded CVs */}
-          {cvUploads[selectedJob] && cvUploads[selectedJob].length > 0 ? (
+          {Array.isArray(cvUploads[selectedJob]) && cvUploads[selectedJob].length > 0 ? (
+
   <ul className="mt-4 space-y-2">
     {cvUploads[selectedJob].map((cv, index) => (
       <li key={index} className="p-2 border rounded-md flex justify-between items-center">
