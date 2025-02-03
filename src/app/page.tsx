@@ -1,6 +1,7 @@
 "use client";  // Required for React state usage
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 
 const companies = [
   { id: 1, name: "Cosy BV", jobs: ["Full stack developer", "Community facillitator"], password: "cosybv" },
@@ -11,20 +12,22 @@ const companies = [
 export default function JobManagementApp() {
   const [selectedCompany, setSelectedCompany] = useState<{ id: number; name: string; jobs: string[]; password: string } | null>(null);
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [passwordInput, setPasswordInput] = useState(""); // Store entered password
   const [passwordError, setPasswordError] = useState(false); // Track incorrect password
   const [cvUploads, setCvUploads] = useState<{ [job: string]: File[] }>(() => {
-    try {
-      return JSON.parse(localStorage.getItem("cvUploads") || "{}") || {};
-    } catch (error) {
-      console.error("Error parsing CV uploads from localStorage:", error);
-      return {};
-    }
-  });
-
-  // ✅ Move useEffect outside of useState (Correct Placement)
-  useEffect(() => {
-    localStorage.setItem("cvUploads", JSON.stringify(cvUploads));
-  }, [cvUploads]);
+      try {
+        return JSON.parse(localStorage.getItem("cvUploads") || "{}") || {};
+      } catch (error) {
+        console.error("Error parsing CV uploads from localStorage:", error);
+        return {};
+      }
+    });
+    
+    // ✅ Move useEffect OUTSIDE of useState (Line ~24)
+    useEffect(() => {
+      localStorage.setItem("cvUploads", JSON.stringify(cvUploads));
+    }, [cvUploads]);
 
   const handleCompanySelection = (company: { id: number; name: string; jobs: string[]; password: string }) => {
     const enteredPassword = prompt(`Enter the password for ${company.name}:`);
@@ -37,6 +40,7 @@ export default function JobManagementApp() {
     }
   };
 
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!selectedJob) return;
     const files = event.target.files;
@@ -46,6 +50,7 @@ export default function JobManagementApp() {
           ...prev,
           [selectedJob]: [...(prev[selectedJob] || []), ...Array.from(files)],
         };
+        localStorage.setItem("cvUploads", JSON.stringify(updatedUploads)); // Save to localStorage
         return updatedUploads;
       });
     }
@@ -55,9 +60,11 @@ export default function JobManagementApp() {
     setCvUploads((prev) => {
       const updatedUploads = { ...prev };
       updatedUploads[job] = updatedUploads[job].filter((_, i) => i !== index);
+      localStorage.setItem("cvUploads", JSON.stringify(updatedUploads)); // Update localStorage
       return updatedUploads;
     });
   };
+  
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -122,31 +129,32 @@ export default function JobManagementApp() {
 
           {/* Display Uploaded CVs */}
           {Array.isArray(cvUploads[selectedJob]) && cvUploads[selectedJob].length > 0 ? (
-            <ul className="mt-4 space-y-2">
-              {cvUploads[selectedJob].map((cv, index) => (
-                <li key={index} className="p-2 border rounded-md flex justify-between items-center">
-                  <span>{cv.name}</span>
-                  <div>
-                    <a 
-                      href={URL.createObjectURL(cv)} 
-                      download={cv.name} 
-                      className="text-blue-500 underline ml-2"
-                    >
-                      Download
-                    </a>
-                    <button 
-                      onClick={() => handleRemoveCV(selectedJob, index)}
-                      className="ml-4 text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500">No CVs uploaded yet.</p>
-          )}
+
+  <ul className="mt-4 space-y-2">
+    {cvUploads[selectedJob].map((cv, index) => (
+      <li key={index} className="p-2 border rounded-md flex justify-between items-center">
+        <span>{cv.name}</span>
+        <div>
+          <a 
+            href={URL.createObjectURL(cv)} 
+            download={cv.name} 
+            className="text-blue-500 underline ml-2"
+          >
+            Download
+          </a>
+          <button 
+            onClick={() => handleRemoveCV(selectedJob, index)}
+            className="ml-4 text-red-500 hover:text-red-700"
+          >
+            Remove
+          </button>
+        </div>
+      </li>
+    ))}
+  </ul>
+) : (
+  <p className="text-gray-500">No CVs uploaded yet.</p>
+)}
         </div>
       )}
     </div>
