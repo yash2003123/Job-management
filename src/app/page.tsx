@@ -11,6 +11,7 @@ const companies = [
 export default function JobManagementApp() {
   const [selectedCompany, setSelectedCompany] = useState<{ id: number; name: string; jobs: string[]; password: string } | null>(null);
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [passwordInput, setPasswordInput] = useState(""); // Store entered password
   const [passwordError, setPasswordError] = useState(false); // Track incorrect password
   const [cvUploads, setCvUploads] = useState<{ [job: string]: File[] }>({});
